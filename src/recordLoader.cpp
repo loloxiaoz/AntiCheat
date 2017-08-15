@@ -58,5 +58,5 @@ int RecordLoader::load(const char * str,RunRecord* pRunRecord)
         pRunRecord->trackPoints.push_back(tPoint);
 
     }
-    return 0;
+    return 1;
 }

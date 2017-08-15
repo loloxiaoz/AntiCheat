@@ -109,6 +109,7 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Se
 {
     //当前线段
     Segment segment;
+    LTPoint lastPoint;
     for(int i=0; i<inputPoints.size(); i++){
         LTPoint point = inputPoints[i];
         //如果不是第一个点
@@ -120,6 +121,7 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Se
                 //如果距离大于阈值或距离方差大于阈值,则重开一个线段
                 segments.push_back(segment);
                 segment.reset();
+                segment.points.push_back(lastPoint);
                 segment.points.push_back(point);
                 continue;
             }else{
@@ -131,5 +133,6 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Se
         }else{
             segment.points.push_back(point);
         }
+        lastPoint = point;
     }
 }
