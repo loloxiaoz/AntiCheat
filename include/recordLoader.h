@@ -1,3 +1,5 @@
+#ifndef RECORDLOADER_H
+#define RECORDLOADER_H
 #include <vector>
 
 using namespace std;
@@ -56,3 +58,5 @@ public:
 
     int load(const char* str,RunRecord* pRunRecord);
 };
+
+#endif

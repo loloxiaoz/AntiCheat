@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "simplifyLine.h"
+#include "geojsonWriter.h"
 
 using namespace std;
 using namespace cv;
@@ -33,8 +34,8 @@ void draw(Segments &segments)
 
 int readRecord(RunRecord* pRunRecord)
 {
-   // char* path = "../../data/lp_20170811.json";
-    char* path = "../../data/20km.json";
+    char* path = "../../data/lp_20170811.json";
+   // char* path = "../../data/20km.json";
 
     FILE* fp = fopen(path, "r");
     if(fp==NULL){
@@ -70,9 +71,10 @@ int readRecord(RunRecord* pRunRecord)
 
 int main(int argc, char * argv[])
 {
+    //读跑步数据
     RunRecord* pRunRecord = new RunRecord;
     int ret = readRecord(pRunRecord);
-
+    //转化到local坐标系
     SimplifyLine simplifyLine;
     BBox2D box = simplifyLine.findBoundingBox2D(pRunRecord->trackPoints);
     vector<LTPoint> inputPoints;
@@ -81,13 +83,23 @@ int main(int argc, char * argv[])
         LTPoint lTPoint = simplifyLine.world2Local(box,tPoint);
         inputPoints.push_back(lTPoint);
     }
-
+    //简化
     Segments segments;
     rgConfig config;
     simplifyLine.simplifyTrack(config,inputPoints,segments);
-
     //绘制
-    draw(segments);
+    //draw(segments);
+    //转化到world坐标系
+    vector<TPoint> simplifyPoints;
+    for(int i=0; i<segments.size(); i++){
+        LTPoint lTPoint = segments[i].points.back();
+        TPoint tPoint = simplifyLine.local2world(box,lTPoint);
+        simplifyPoints.push_back(tPoint);
+    }
+    //输出为geojson文件
+    GeojsonWriter writer;
+    char* outputPath = "../../data/simplify.json";
+    writer.appendLine(outputPath,simplifyPoints);
 
     delete pRunRecord;
     return 0;
