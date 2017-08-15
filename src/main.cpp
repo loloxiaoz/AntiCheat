@@ -45,18 +45,9 @@ int readRecord(RunRecord* pRunRecord)
 
     fseek(fp, 0L, SEEK_END);
     int len = ftell(fp);
-    if(len==-1){
-        cerr<<"error: cannot get length of file"<<endl;
-        return -1;
-    }
-
     fseek(fp, 0L, SEEK_SET);
     char* content = new char[len+1];
-    int n = fread(content, len, 1, fp);
-    if(n!=1){
-        cerr<<"error: cannot read from file"<<endl;
-        return -1;
-    }
+    fread(content, len, 1, fp);
 
     RecordLoader loader;
     int ret = loader.load(content,pRunRecord);

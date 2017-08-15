@@ -45,7 +45,13 @@ int GeojsonWriter::appendLine(const char* outPathName,vector<TPoint>& points)
     if(stat(outPathName,&fileInfo)==-1&&errno==ENOENT){
        initFile(outPathName);
     }
-    string jsonStr(outPathName);
+    FILE* fp = fopen(outPathName, "r");
+    fseek(fp, 0L, SEEK_END);
+    int len = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+    char* content = new char[len+1];
+    fread(content, len, 1, fp);
+    string jsonStr(content);
     Json::Reader reader;
     Json::Value root;
     if (!reader.parse(jsonStr, root)){
@@ -54,8 +60,8 @@ int GeojsonWriter::appendLine(const char* outPathName,vector<TPoint>& points)
     Json::Value coordinates;
     for(int i=0; i<points.size();i++){
         Json::Value line;
-        line.append(points[i].latitude);
         line.append(points[i].longitude);
+        line.append(points[i].latitude);
         coordinates.append(line);
     }
     Json::Value geometry;
@@ -69,5 +75,7 @@ int GeojsonWriter::appendLine(const char* outPathName,vector<TPoint>& points)
     feature["properties"]   = properties;
     root["features"].append(feature);
     saveFile(outPathName,root);
+
+    delete content;
     return 1;
 }
