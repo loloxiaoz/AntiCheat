@@ -66,14 +66,6 @@ int main(int argc, char * argv[])
         return -1;
     }
     //读跑步数据
-<<<<<<< HEAD
-=======
-    if(argc!=2)
-    {
-        printf("AntiCheat Usage, ./AntiCheat runRecordPath\n");
-        return -1;
-    }
->>>>>>> 63cc7ff9a46725784c715237a0bc31e30d94fbc6
     char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
     int ret = readRecord(path,pRunRecord);
@@ -113,6 +105,11 @@ int main(int argc, char * argv[])
         char* outputPath = "../../data/simplify.json";
         writer.appendLine(outputPath,simplifyPoints);
     }
+
+    // GeojsonWriter writer;
+    // char* outputPath = "../../data/lp_simplify.json";
+    // writer.appendLine(outputPath,pRunRecord->trackPoints);
+
     delete pRunRecord;
     return 0;
 }
