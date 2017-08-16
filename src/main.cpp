@@ -3,6 +3,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "simplifyLine.h"
 #include "geojsonWriter.h"
+#include "transform.h"
 
 using namespace std;
 using namespace cv;
@@ -88,12 +89,17 @@ int main(int argc, char * argv[])
     //draw(segments);
     //转化到world坐标系
     vector<TPoint> simplifyPoints;
+    Transform transform;
     LTPoint lTPoint = segments[0].points[0];
     TPoint tPoint = simplifyLine.local2world(box,lTPoint);
     simplifyPoints.push_back(tPoint);
     for(int i=0; i<segments.size(); i++){
         lTPoint = segments[i].points.back();
         tPoint = simplifyLine.local2world(box,lTPoint);
+        double mgLat,mgLon;
+        transform.gcj2wgs84(tPoint.latitude,tPoint.longitude,mgLat,mgLon);
+        tPoint.latitude     = mgLat;
+        tPoint.longitude    = mgLon;
         simplifyPoints.push_back(tPoint);
     }
     //输出为geojson文件
