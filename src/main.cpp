@@ -32,9 +32,9 @@ void draw(Segments &segments)
     cvDestroyWindow("Lines");
 }
 
-int readRecord(RunRecord* pRunRecord)
+int readRecord(char* path,RunRecord* pRunRecord)
 {
-    char* path = "../../data/lp_20170811.json";
+   //char* path = "../../data/lp_20170811.json";
    // char* path = "../../data/20km.json";
 
     FILE* fp = fopen(path, "r");
@@ -62,9 +62,15 @@ int readRecord(RunRecord* pRunRecord)
 
 int main(int argc, char * argv[])
 {
+    if(argc!=2)
+    {
+        printf("AntiCheat Usage, ./AntiCheat runRecordPath\n");
+        return -1;
+    }
     //读跑步数据
+    char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
-    int ret = readRecord(pRunRecord);
+    int ret = readRecord(path,pRunRecord);
     //转化到local坐标系
     SimplifyLine simplifyLine;
     BBox2D box = simplifyLine.findBoundingBox2D(pRunRecord->trackPoints);
@@ -82,9 +88,12 @@ int main(int argc, char * argv[])
     //draw(segments);
     //转化到world坐标系
     vector<TPoint> simplifyPoints;
+    LTPoint lTPoint = segments[0].points[0];
+    TPoint tPoint = simplifyLine.local2world(box,lTPoint);
+    simplifyPoints.push_back(tPoint);
     for(int i=0; i<segments.size(); i++){
-        LTPoint lTPoint = segments[i].points.back();
-        TPoint tPoint = simplifyLine.local2world(box,lTPoint);
+        lTPoint = segments[i].points.back();
+        tPoint = simplifyLine.local2world(box,lTPoint);
         simplifyPoints.push_back(tPoint);
     }
     //输出为geojson文件

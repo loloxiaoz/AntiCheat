@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.3.1, 2017-08-13T17:07:13. -->
+<!-- Written by QtCreator 4.3.1, 2017-08-16T11:28:10. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -339,7 +339,7 @@
      <value type="int">14</value>
     </valuelist>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">AntiCheat</value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">./AntiCheat ../../data/lp_20170811.json</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments">../../data/lp_20170811.json</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/Users/lolo/devspace/AntiCheat/build/src</value>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
