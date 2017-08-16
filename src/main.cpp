@@ -35,9 +35,6 @@ void draw(Segments &segments)
 
 int readRecord(char* path,RunRecord* pRunRecord)
 {
-   //char* path = "../../data/lp_20170811.json";
-   // char* path = "../../data/20km.json";
-
     FILE* fp = fopen(path, "r");
     if(fp==NULL){
         cerr<<"error: cannot open json file"<<endl;
@@ -69,6 +66,14 @@ int main(int argc, char * argv[])
         return -1;
     }
     //读跑步数据
+<<<<<<< HEAD
+=======
+    if(argc!=2)
+    {
+        printf("AntiCheat Usage, ./AntiCheat runRecordPath\n");
+        return -1;
+    }
+>>>>>>> 63cc7ff9a46725784c715237a0bc31e30d94fbc6
     char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
     int ret = readRecord(path,pRunRecord);
@@ -103,10 +108,11 @@ int main(int argc, char * argv[])
         simplifyPoints.push_back(tPoint);
     }
     //输出为geojson文件
-    GeojsonWriter writer;
-    char* outputPath = "../../data/simplify.json";
-    writer.appendLine(outputPath,simplifyPoints);
-
+    if(simplifyPoints.size()>1){
+        GeojsonWriter writer;
+        char* outputPath = "../../data/simplify.json";
+        writer.appendLine(outputPath,simplifyPoints);
+    }
     delete pRunRecord;
     return 0;
 }
