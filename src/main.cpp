@@ -88,9 +88,12 @@ int main(int argc, char * argv[])
     //draw(segments);
     //转化到world坐标系
     vector<TPoint> simplifyPoints;
+    LTPoint lTPoint = segments[0].points[0];
+    TPoint tPoint = simplifyLine.local2world(box,lTPoint);
+    simplifyPoints.push_back(tPoint);
     for(int i=0; i<segments.size(); i++){
-        LTPoint lTPoint = segments[i].points.back();
-        TPoint tPoint = simplifyLine.local2world(box,lTPoint);
+        lTPoint = segments[i].points.back();
+        tPoint = simplifyLine.local2world(box,lTPoint);
         simplifyPoints.push_back(tPoint);
     }
     //输出为geojson文件
@@ -99,6 +102,11 @@ int main(int argc, char * argv[])
         char* outputPath = "../../data/simplify.json";
         writer.appendLine(outputPath,simplifyPoints);
     }
+
+    // GeojsonWriter writer;
+    // char* outputPath = "../../data/lp_simplify.json";
+    // writer.appendLine(outputPath,pRunRecord->trackPoints);
+
     delete pRunRecord;
     return 0;
 }

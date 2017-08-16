@@ -17,6 +17,10 @@
 #define INT_MAX       2147483647
 #endif
 
+#ifndef SCALE_TRANS
+#define SCALE_TRANS  50000
+#endif
+
 #define DOUBLE_EQ_ZERO(x) (fabs(x) < 1e-6)
 #define DOUBLE_NEQ_ZERO(x) (fabs(x) > 1e-6)
 
@@ -49,8 +53,8 @@ LTPoint SimplifyLine::world2Local(BBox2D box, TPoint point)
 {
     LTPoint lTPoint;
     lTPoint.seqNo   = point.seqNo;
-    lTPoint.x       = (point.longitude-box.xMin)*50000;
-    lTPoint.y       = (point.latitude-box.yMin)*50000;
+    lTPoint.x       = (point.longitude-box.xMin)*SCALE_TRANS;
+    lTPoint.y       = (point.latitude-box.yMin)*SCALE_TRANS;
     return lTPoint;
 }
 
@@ -58,8 +62,8 @@ TPoint SimplifyLine::local2world(BBox2D box, LTPoint lTPoint)
 {
     TPoint tPoint;
     tPoint.seqNo       = lTPoint.seqNo;
-    tPoint.longitude   = lTPoint.x/100000+box.xMin;
-    tPoint.latitude    = lTPoint.y/100000+box.yMin;
+    tPoint.longitude   = lTPoint.x/SCALE_TRANS+box.xMin;
+    tPoint.latitude    = lTPoint.y/SCALE_TRANS+box.yMin;
     return tPoint;
 }
 
@@ -135,4 +139,5 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Se
         }
         lastPoint = point;
     }
+    segments.push_back(segment);
 }
