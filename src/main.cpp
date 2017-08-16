@@ -32,9 +32,9 @@ void draw(Segments &segments)
     cvDestroyWindow("Lines");
 }
 
-int readRecord(RunRecord* pRunRecord)
+int readRecord(char* path,RunRecord* pRunRecord)
 {
-    char* path = "../../data/lp_20170811.json";
+    //char* path = "../../data/lp_20170811.json";
    // char* path = "../../data/20km.json";
 
     FILE* fp = fopen(path, "r");
@@ -63,8 +63,14 @@ int readRecord(RunRecord* pRunRecord)
 int main(int argc, char * argv[])
 {
     //读跑步数据
+    if(argc!=2)
+    {
+        printf("AntiCheat Usage, ./AntiCheat runRecordPath\n");
+        return -1;
+    }
+    char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
-    int ret = readRecord(pRunRecord);
+    int ret = readRecord(path,pRunRecord);
     //转化到local坐标系
     SimplifyLine simplifyLine;
     BBox2D box = simplifyLine.findBoundingBox2D(pRunRecord->trackPoints);
@@ -88,10 +94,11 @@ int main(int argc, char * argv[])
         simplifyPoints.push_back(tPoint);
     }
     //输出为geojson文件
-    GeojsonWriter writer;
-    char* outputPath = "../../data/simplify.json";
-    writer.appendLine(outputPath,simplifyPoints);
-
+    if(simplifyPoints.size()>1){
+        GeojsonWriter writer;
+        char* outputPath = "../../data/simplify.json";
+        writer.appendLine(outputPath,simplifyPoints);
+    }
     delete pRunRecord;
     return 0;
 }
