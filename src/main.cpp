@@ -93,17 +93,23 @@ int main(int argc, char * argv[])
     for(int i=0; i<segments.size(); i++){
         lTPoint = segments[i].points.back();
         tPoint = simplifyLine.local2world(box,lTPoint);
+        simplifyPoints.push_back(tPoint);
+    }
+    //转换到wgs84坐标系
+    vector<TPoint> simplifyWGS84Points;
+    for(int i=0; i<simplifyPoints.size(); i++){
+        TPoint tPoint = simplifyPoints[i];
         double mgLat,mgLon;
         transform.gcj2wgs84(tPoint.latitude,tPoint.longitude,mgLat,mgLon);
         tPoint.latitude     = mgLat;
         tPoint.longitude    = mgLon;
-        simplifyPoints.push_back(tPoint);
+        simplifyWGS84Points.push_back(tPoint);
     }
     //输出为geojson文件
     if(simplifyPoints.size()>1){
         GeojsonWriter writer;
         char* outputPath = "../../data/simplify.json";
-        writer.appendLine(outputPath,simplifyPoints);
+        writer.appendLine(outputPath,simplifyWGS84Points);
     }
 
     // GeojsonWriter writer;
