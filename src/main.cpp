@@ -60,9 +60,9 @@ int readRecord(char* path,RunRecord* pRunRecord)
 
 int main(int argc, char * argv[])
 {
-    if(argc!=2)
+    if(argc!=3)
     {
-        printf("AntiCheat Usage, ./AntiCheat runRecordPath\n");
+        printf("AntiCheat Usage, ./AntiCheat runRecordPath outputPath\n");
         return -1;
     }
     //读跑步数据
@@ -108,7 +108,7 @@ int main(int argc, char * argv[])
     //输出为geojson文件
     if(simplifyPoints.size()>1){
         GeojsonWriter writer;
-        char* outputPath = "../../data/simplify.json";
+        char* outputPath = argv[2];
         writer.appendLine(outputPath,simplifyWGS84Points);
     }
 
