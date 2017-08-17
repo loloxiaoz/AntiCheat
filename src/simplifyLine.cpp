@@ -21,10 +21,6 @@
 #define SCALE_TRANS  50000
 #endif
 
-#ifndef LINE_MAX
-#define LINE_MAX 5000
-#endif
-
 #define DOUBLE_EQ_ZERO(x) (fabs(x) < 1e-6)
 #define DOUBLE_NEQ_ZERO(x) (fabs(x) > 1e-6)
 
@@ -99,7 +95,7 @@ double SimplifyLine::calcVariance(LineParam param,vector<LTPoint> points)
     int size = points.size();
     for(int i=0; i<size; i++){
         double distance =  calcDistance(param, points[i]);
-        sum += distance*distance;
+        sum += distance;
     }
     return sum/size;
 }
@@ -118,21 +114,10 @@ double SimplifyLine::calcPointDistance(LTPoint startPoint,LTPoint endPoint)
     return sqrt(pow((endPoint.x-startPoint.x),2)+pow((endPoint.y-startPoint.y),2));
 }
 
-bool SimplifyLine::isValidSegment(Segment& segment)
+void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Tracks& tracks)
 {
-    if(segment.points.size()>=2){
-        LTPoint startPoint = segment.points[0];
-        LTPoint endPoint = segment.points.back();
-        double distance = calcPointDistance(startPoint,endPoint);
-        if(distance<LINE_MAX){
-            return true;
-        }
-    }
-    return false;
-}
-
-void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Segments& segments)
-{
+    //当前轨迹
+    Segments segments;
     //当前线段
     Segment segment;
     LTPoint lastPoint;
@@ -140,30 +125,41 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Se
         LTPoint point = inputPoints[i];
         //如果不是第一个点
         if(segment.points.size()>=1){
-            LineParam lParam = calcLine(segment.points[0],point);
+            LTPoint startPoint = segment.points[0];
+            LTPoint endPoint = point;
+            LineParam lParam = calcLine(startPoint,endPoint);
             double maxDist   = calcMaxDistance(lParam,segment.points);
             double variance  = calcVariance(lParam,segment.points);
-            if(maxDist>config.maxDistance||variance>config.maxVariance){
-                //如果距离大于阈值或距离方差大于阈值,则重开一个线段
-                if(isValidSegment(segment)){
-                    segments.push_back(segment);
+            double distance  = calcPointDistance(segment.points.back(),endPoint);
+            if(distance>config.maxDist){
+                //如果最近两点距离相差太大,则重开一个轨迹
+//                printf("非法数据的距离为%f\n",distance);
+                if(segments.size()>0){
+                    tracks.push_back(segments);
+                    segments.clear();
                 }
                 segment.reset();
-                segment.points.push_back(lastPoint);
-                segment.points.push_back(point);
-                continue;
             }else{
-                segment.points.push_back(point);
-                lParam.maxDist  = maxDist;
-                lParam.variance = variance;
-                segment.lParam  = lParam;
+                if(maxDist>config.maxDeviateDistance||variance>config.maxVariance){
+                    //如果距离大于阈值或距离方差大于阈值,则重开一个线段
+                    segments.push_back(segment);
+                    segment.reset();
+                    segment.points.push_back(lastPoint);
+                }else{
+                    //还在正常的线段上
+                    segment.lParam          = lParam;
+                    segment.lParam.maxDist  = maxDist;
+                    segment.lParam.variance = variance;
+                    segment.lParam.distance = distance;
+                }
             }
-        }else{
-            segment.points.push_back(point);
         }
+        segment.points.push_back(point);
         lastPoint = point;
     }
-    if(isValidSegment(segment)){
+    //最后一个线段
+    if(segment.points.size()>1){
         segments.push_back(segment);
+        tracks.push_back(segments);
     }
 }

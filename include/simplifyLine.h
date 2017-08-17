@@ -35,6 +35,7 @@ typedef struct LineParam
     double   c;
     double   maxDist;
     double   variance;
+    double   distance;
 
     void reset(){
         a           = 0;
@@ -42,20 +43,25 @@ typedef struct LineParam
         c           = 0;
         maxDist     = 0;
         variance    = 0;
+        distance    = 0;
     }
 
 }LineParam;
 
 typedef struct regressionConfig
 {
-    double   minPoints;
-    double   maxDistance;
-    double   maxVariance;
+    double  minPoints;
+    double  maxDeviateDistance;
+    double  maxVariance;
+    double  maxDist;
+    double  minVariance;
 
     regressionConfig(){
-        minPoints       = 4;
-        maxDistance     = 8;
-        maxVariance     = 4;
+        minPoints           = 4;
+        maxDeviateDistance  = 6;
+        maxVariance         = 3;
+        maxDist             = 1000;
+        minVariance         = 0.2;
     }
 
 }rgConfig;
@@ -73,7 +79,10 @@ typedef struct SegmentStruct
     }
 }Segment;
 
+//轨迹
 typedef vector<Segment> Segments;
+//多条轨迹的集合
+typedef vector<Segments> Tracks;
 
 class SimplifyLine
 {
@@ -87,6 +96,5 @@ public:
     double calcVariance(LineParam lParam,vector<LTPoint> points);
     LineParam calcLine(LTPoint startPoint,LTPoint endPoint);
     double calcPointDistance(LTPoint startPoint,LTPoint endPoint);
-    bool isValidSegment(Segment& segment);
-    void simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Segments& segments);
+    void simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Tracks& tracks);
 };
