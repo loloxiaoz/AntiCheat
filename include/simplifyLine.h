@@ -86,5 +86,7 @@ public:
     double calcMaxDistance(LineParam lParam,vector<LTPoint> points);
     double calcVariance(LineParam lParam,vector<LTPoint> points);
     LineParam calcLine(LTPoint startPoint,LTPoint endPoint);
+    double calcPointDistance(LTPoint startPoint,LTPoint endPoint);
+    bool isValidSegment(Segment& segment);
     void simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Segments& segments);
 };
