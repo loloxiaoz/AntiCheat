@@ -21,6 +21,10 @@
 #define SCALE_TRANS  50000
 #endif
 
+#ifndef LINE_MAX
+#define LINE_MAX 5000
+#endif
+
 #define DOUBLE_EQ_ZERO(x) (fabs(x) < 1e-6)
 #define DOUBLE_NEQ_ZERO(x) (fabs(x) > 1e-6)
 
@@ -109,6 +113,24 @@ LineParam SimplifyLine::calcLine(LTPoint startPoint,LTPoint endPoint)
     return lParam;
 }
 
+double SimplifyLine::calcPointDistance(LTPoint startPoint,LTPoint endPoint)
+{
+    return sqrt(pow((endPoint.x-startPoint.x),2)+pow((endPoint.y-startPoint.y),2));
+}
+
+bool SimplifyLine::isValidSegment(Segment& segment)
+{
+    if(segment.points.size()>=2){
+        LTPoint startPoint = segment.points[0];
+        LTPoint endPoint = segment.points.back();
+        double distance = calcPointDistance(startPoint,endPoint);
+        if(distance<LINE_MAX){
+            return true;
+        }
+    }
+    return false;
+}
+
 void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Segments& segments)
 {
     //当前线段
@@ -123,7 +145,9 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Se
             double variance  = calcVariance(lParam,segment.points);
             if(maxDist>config.maxDistance||variance>config.maxVariance){
                 //如果距离大于阈值或距离方差大于阈值,则重开一个线段
-                segments.push_back(segment);
+                if(isValidSegment(segment)){
+                    segments.push_back(segment);
+                }
                 segment.reset();
                 segment.points.push_back(lastPoint);
                 segment.points.push_back(point);
@@ -139,5 +163,7 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Se
         }
         lastPoint = point;
     }
-    segments.push_back(segment);
+    if(isValidSegment(segment)){
+        segments.push_back(segment);
+    }
 }

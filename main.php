@@ -5,7 +5,8 @@ $endPos     = intval($argv[2]);
 echo "开始导入第".$beginPos."至".$endPos."条\n";
 $rootDir = dirname(__FILE__);
 $recordPath = $rootDir."/data/".$beginPos."_tmpRecord.json";
-$outputBasePath = $rootDir."/data/".$beginPos."_";
+#$outputBasePath = $rootDir."/data/".$beginPos."_";
+$outputBasePath = $rootDir."/output/";
 $file   = file_get_contents("./data/record.log");
 $lines  = explode("\n",$file);
 $cnt    = 0;
@@ -34,8 +35,7 @@ foreach($lines as $line){
             }else{
                 $outputPath = $outputBasePath."42000.geojson";
             }
-            echo "距离".$distance."\n";
-            exec("cd ./build/src;./AntiCheat $recordPath $outputPath");
+            echo exec("cd ./build/src;./AntiCheat $recordPath $outputPath");
         }
     }catch(Exception $e){
         file_put_contents("run.log",$id."下载失败",FILE_APPEND);
