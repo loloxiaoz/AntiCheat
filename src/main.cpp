@@ -123,7 +123,7 @@ int main(int argc, char * argv[])
             char* outputPath = argv[2];
             writer.appendLine(outputPath,simplifyWGS84Points);
         }
-        simplifyLine.clear();
+        simplifyPoints.clear();
     }
 
     // GeojsonWriter writer;
