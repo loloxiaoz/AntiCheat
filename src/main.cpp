@@ -88,11 +88,11 @@ int main(int argc, char * argv[])
     rgConfig config;
     simplifyLine.simplifyTrack(config,inputPoints,tracks);
     //绘制
-    draw(tracks);
-    //转化到world坐标系
+//    draw(tracks);
     vector<TPoint> simplifyPoints;
     Transform transform;
     for(int j=0; j<tracks.size(); j++){
+        //转化到world坐标系
         segments    = tracks[j];
         LTPoint lTPoint = segments[0].points[0];
         TPoint tPoint = simplifyLine.local2world(box,lTPoint);
@@ -102,22 +102,23 @@ int main(int argc, char * argv[])
             tPoint = simplifyLine.local2world(box,lTPoint);
             simplifyPoints.push_back(tPoint);
         }
-    }
-    //转换到wgs84坐标系
-    vector<TPoint> simplifyWGS84Points;
-    for(int i=0; i<simplifyPoints.size(); i++){
-        TPoint tPoint = simplifyPoints[i];
-        double mgLat,mgLon;
-        transform.gcj2wgs84(tPoint.latitude,tPoint.longitude,mgLat,mgLon);
-        tPoint.latitude     = mgLat;
-        tPoint.longitude    = mgLon;
-        simplifyWGS84Points.push_back(tPoint);
-    }
-    //输出为geojson文件
-    if(simplifyPoints.size()>1){
-        GeojsonWriter writer;
-        char* outputPath = argv[2];
-        writer.appendLine(outputPath,simplifyWGS84Points);
+        //转换到wgs84坐标系
+        vector<TPoint> simplifyWGS84Points;
+        for(int i=0; i<simplifyPoints.size(); i++){
+            TPoint tPoint = simplifyPoints[i];
+            double mgLat,mgLon;
+            transform.gcj2wgs84(tPoint.latitude,tPoint.longitude,mgLat,mgLon);
+            tPoint.latitude     = mgLat;
+            tPoint.longitude    = mgLon;
+            simplifyWGS84Points.push_back(tPoint);
+        }
+        //输出为geojson文件
+        if(simplifyPoints.size()>1){
+            GeojsonWriter writer;
+            char* outputPath = argv[2];
+            writer.appendLine(outputPath,simplifyWGS84Points);
+        }
+        simplifyLine.clear();
     }
 
     // GeojsonWriter writer;
