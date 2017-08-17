@@ -35,7 +35,8 @@ foreach($lines as $line){
             }else{
                 $outputPath = $outputBasePath."42000.geojson";
             }
-            echo exec("cd ./build/src;./AntiCheat $recordPath $outputPath");
+            echo "处理id为".$id."\n";
+            exec("cd ./build/src;./AntiCheat $recordPath $outputPath");
         }
     }catch(Exception $e){
         file_put_contents("run.log",$id."下载失败",FILE_APPEND);

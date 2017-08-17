@@ -73,6 +73,11 @@ int main(int argc, char * argv[])
     char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
     int ret = readRecord(path,pRunRecord);
+    if(pRunRecord->trackPoints.size()<=2){
+        printf("error,too less track points\n");
+        return -1;
+    }
+
     //转化到local坐标系
     SimplifyLine simplifyLine;
     BBox2D box = simplifyLine.findBoundingBox2D(pRunRecord->trackPoints);
@@ -88,7 +93,7 @@ int main(int argc, char * argv[])
     rgConfig config;
     simplifyLine.simplifyTrack(config,inputPoints,tracks);
     //绘制
-    draw(tracks);
+//    draw(tracks);
     //转化到world坐标系
     vector<TPoint> simplifyPoints;
     Transform transform;
