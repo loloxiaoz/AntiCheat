@@ -131,6 +131,11 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Tr
             double maxDist   = calcMaxDistance(lParam,segment.points);
             double variance  = calcVariance(lParam,segment.points);
             double distance  = calcPointDistance(segment.points.back(),endPoint);
+            double length    = calcPointDistance(startPoint,endPoint);
+            if(DOUBLE_EQ_ZERO(distance)){
+                //如果两个点距离过近
+                continue;
+            }
             if(distance>config.maxDist){
                 //如果最近两点距离相差太大,则重开一个轨迹
 //                printf("非法数据的距离为%f\n",distance);
@@ -151,6 +156,7 @@ void SimplifyLine::simplifyTrack(rgConfig config,vector<LTPoint>& inputPoints,Tr
                     segment.lParam.maxDist  = maxDist;
                     segment.lParam.variance = variance;
                     segment.lParam.distance = distance;
+                    segment.lParam.length   = length;
                 }
             }
         }

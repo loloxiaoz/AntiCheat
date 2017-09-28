@@ -56,6 +56,7 @@ class RecordLoader
 public:
     RecordLoader();
 
+    int read(char* path,RunRecord* pRunRecord);
     int load(const char* str,RunRecord* pRunRecord);
 };
 

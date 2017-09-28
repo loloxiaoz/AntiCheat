@@ -1,8 +1,34 @@
+#include <iostream>
 #include "json.h"
 #include "recordLoader.h"
 
 RecordLoader::RecordLoader()
 {
+}
+
+int RecordLoader::read(char* path,RunRecord* pRunRecord)
+{
+    FILE* fp = fopen(path, "r");
+    if(fp==NULL){
+        cerr<<"error: cannot open json file"<<endl;
+        return -1;
+    }
+
+    fseek(fp, 0L, SEEK_END);
+    int len = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+    char* content = new char[len+1];
+    fread(content, len, 1, fp);
+
+    RecordLoader loader;
+    int ret = loader.load(content,pRunRecord);
+
+    if(ret!=1){
+        cerr<<"error: load file error"<<endl;
+        return -1;
+    }
+    delete content;
+    return 1;
 }
 
 int RecordLoader::load(const char * str,RunRecord* pRunRecord)

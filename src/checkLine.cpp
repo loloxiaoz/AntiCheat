@@ -2,11 +2,31 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "simplifyLine.h"
-#include "geojsonWriter.h"
 #include "transform.h"
 
 using namespace std;
 using namespace cv;
+
+int checkLine(Segment segment)
+{
+    enum LineReason{Distance=-1,Variance=-2,StepLength=-3};
+    vector<LTPoint> points = segment.points;
+    LineParam lParam = segment.lParam;
+    if(points.size()>2){
+        if(lParam.maxDist<0.1){
+            return Distance;
+        }
+        if(lParam.variance<0.05){
+            return Variance;
+        }
+    }else{
+        double stepLength = lParam.length/points.size();
+        if(stepLength>10){
+            return StepLength;
+        }
+    }
+    return 0;
+}
 
 void draw(Tracks &tracks)
 {
@@ -37,24 +57,18 @@ void draw(Tracks &tracks)
     cvDestroyWindow("Lines");
 }
 
-
-
 int main(int argc, char * argv[])
 {
-    if(argc!=3)
+    if(argc!=2)
     {
-        printf("AntiCheat Usage, ./AntiCheat runRecordPath outputPath\n");
+        printf("CheckLine Usage, ./AntiCheat runRecordPath\n");
         return -1;
     }
     //读跑步数据
     char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
-    readRecord(path,pRunRecord);
-    if(pRunRecord->trackPoints.size()<=2){
-        printf("error,too less track points\n");
-        return -1;
-    }
-
+    RecordLoader recordLoader;
+    recordLoader.read(path,pRunRecord);
     //转化到local坐标系
     SimplifyLine simplifyLine;
     BBox2D box = simplifyLine.findBoundingBox2D(pRunRecord->trackPoints);
@@ -64,49 +78,25 @@ int main(int argc, char * argv[])
         LTPoint lTPoint = simplifyLine.world2Local(box,tPoint);
         inputPoints.push_back(lTPoint);
     }
+    delete pRunRecord;
     //简化
     Tracks tracks;
     Segments segments;
     rgConfig config;
     simplifyLine.simplifyTrack(config,inputPoints,tracks);
     //绘制
-    draw(tracks);
-    vector<TPoint> simplifyPoints;
-    Transform transform;
+//    draw(tracks);
+    int ret = 0;
     for(int j=0; j<tracks.size(); j++){
-        //转化到world坐标系
         segments    = tracks[j];
-        LTPoint lTPoint = segments[0].points[0];
-        TPoint tPoint = simplifyLine.local2world(box,lTPoint);
-        simplifyPoints.push_back(tPoint);
         for(int i=0; i<segments.size(); i++){
-            lTPoint = segments[i].points.back();
-            tPoint = simplifyLine.local2world(box,lTPoint);
-            simplifyPoints.push_back(tPoint);
+            Segment segment = segments[i];
+            ret = checkLine(segment);
+            if(ret!=0){
+                break;
+            }
         }
-        //转换到wgs84坐标系
-        vector<TPoint> simplifyWGS84Points;
-        for(int i=0; i<simplifyPoints.size(); i++){
-            TPoint tPoint = simplifyPoints[i];
-            double mgLat,mgLon;
-            transform.gcj2wgs84(tPoint.latitude,tPoint.longitude,mgLat,mgLon);
-            tPoint.latitude     = mgLat;
-            tPoint.longitude    = mgLon;
-            simplifyWGS84Points.push_back(tPoint);
-        }
-        //输出为geojson文件
-        if(simplifyPoints.size()>1){
-            GeojsonWriter writer;
-            char* outputPath = argv[2];
-            writer.appendLine(outputPath,simplifyWGS84Points);
-        }
-        simplifyPoints.clear();
     }
-
-    // GeojsonWriter writer;
-    // char* outputPath = "../../data/lp_simplify.json";
-    // writer.appendLine(outputPath,pRunRecord->trackPoints);
-
-    delete pRunRecord;
-    return 0;
+    printf("Checkline ret: %d \n", ret);
+    return ret;
 }
