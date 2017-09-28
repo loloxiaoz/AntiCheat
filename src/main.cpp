@@ -37,30 +37,7 @@ void draw(Tracks &tracks)
     cvDestroyWindow("Lines");
 }
 
-int readRecord(char* path,RunRecord* pRunRecord)
-{
-    FILE* fp = fopen(path, "r");
-    if(fp==NULL){
-        cerr<<"error: cannot open json file"<<endl;
-        return -1;
-    }
 
-    fseek(fp, 0L, SEEK_END);
-    int len = ftell(fp);
-    fseek(fp, 0L, SEEK_SET);
-    char* content = new char[len+1];
-    fread(content, len, 1, fp);
-
-    RecordLoader loader;
-    int ret = loader.load(content,pRunRecord);
-
-    if(ret!=1){
-        cerr<<"error: load file error"<<endl;
-        return -1;
-    }
-    delete content;
-    return 1;
-}
 
 int main(int argc, char * argv[])
 {
@@ -72,7 +49,8 @@ int main(int argc, char * argv[])
     //读跑步数据
     char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
-    int ret = readRecord(path,pRunRecord);
+    RecordLoader recordLoader;
+    int ret = recordLoader.read(path,pRunRecord);
     //转化到local坐标系
     SimplifyLine simplifyLine;
     BBox2D box = simplifyLine.findBoundingBox2D(pRunRecord->trackPoints);
@@ -88,7 +66,7 @@ int main(int argc, char * argv[])
     rgConfig config;
     simplifyLine.simplifyTrack(config,inputPoints,tracks);
     //绘制
-//    draw(tracks);
+    draw(tracks);
     vector<TPoint> simplifyPoints;
     Transform transform;
     for(int j=0; j<tracks.size(); j++){
@@ -118,7 +96,7 @@ int main(int argc, char * argv[])
             char* outputPath = argv[2];
             writer.appendLine(outputPath,simplifyWGS84Points);
         }
-        simplifyLine.clear();
+        simplifyPoints.clear();
     }
 
     // GeojsonWriter writer;

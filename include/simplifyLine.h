@@ -36,6 +36,7 @@ typedef struct LineParam
     double   maxDist;
     double   variance;
     double   distance;
+    double   length;
 
     void reset(){
         a           = 0;
@@ -44,6 +45,7 @@ typedef struct LineParam
         maxDist     = 0;
         variance    = 0;
         distance    = 0;
+        length      = 0;
     }
 
 }LineParam;
