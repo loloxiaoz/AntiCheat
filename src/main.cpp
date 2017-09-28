@@ -71,7 +71,7 @@ int main(int argc, char * argv[])
     rgConfig config;
     simplifyLine.simplifyTrack(config,inputPoints,tracks);
     //绘制
-    draw(tracks);
+//    draw(tracks);
     vector<TPoint> simplifyPoints;
     Transform transform;
     for(int j=0; j<tracks.size(); j++){

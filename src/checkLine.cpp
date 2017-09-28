@@ -7,9 +7,10 @@
 using namespace std;
 using namespace cv;
 
+enum LineReason{Distance=-1,Variance=-2,StepLength=-3,NoTrackPoints=-4};
+
 int checkLine(Segment segment)
-{
-    enum LineReason{Distance=-1,Variance=-2,StepLength=-3};
+{ 
     vector<LTPoint> points = segment.points;
     LineParam lParam = segment.lParam;
     if(points.size()>2){
@@ -64,11 +65,17 @@ int main(int argc, char * argv[])
         printf("CheckLine Usage, ./AntiCheat runRecordPath\n");
         return -1;
     }
+    int ret = 0;
     //读跑步数据
     char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
     RecordLoader recordLoader;
     recordLoader.read(path,pRunRecord);
+    if(pRunRecord->trackPoints.size()<=2){
+        ret = NoTrackPoints;
+        printf("Checkline ret: %d \n", ret);
+        return ret;
+    }
     //转化到local坐标系
     SimplifyLine simplifyLine;
     BBox2D box = simplifyLine.findBoundingBox2D(pRunRecord->trackPoints);
@@ -86,7 +93,6 @@ int main(int argc, char * argv[])
     simplifyLine.simplifyTrack(config,inputPoints,tracks);
     //绘制
 //    draw(tracks);
-    int ret = 0;
     for(int j=0; j<tracks.size(); j++){
         segments    = tracks[j];
         for(int i=0; i<segments.size(); i++){
