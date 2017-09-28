@@ -49,7 +49,8 @@ int main(int argc, char * argv[])
     //读跑步数据
     char* path = argv[1];
     RunRecord* pRunRecord = new RunRecord;
-    readRecord(path,pRunRecord);
+    RecordLoader recordLoader;
+    recordLoader.read(path,pRunRecord);
     if(pRunRecord->trackPoints.size()<=2){
         printf("error,too less track points\n");
         return -1;
