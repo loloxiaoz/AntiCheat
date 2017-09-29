@@ -10,14 +10,14 @@ using namespace cv;
 enum LineReason{Distance=-1,Variance=-2,StepLength=-3,NoTrackPoints=-4};
 
 int checkLine(Segment segment)
-{ 
+{
     vector<LTPoint> points = segment.points;
     LineParam lParam = segment.lParam;
     if(points.size()>2){
-        if(lParam.maxDist<0.1){
+        if(lParam.maxDist<0.02&&lParam.length>1000){
             return Distance;
         }
-        if(lParam.variance<0.05){
+        if(lParam.variance<0.03&&lParam.length>1000){
             return Variance;
         }
     }else{

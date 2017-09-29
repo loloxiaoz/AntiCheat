@@ -52,5 +52,6 @@ foreach($lines as $line){
         $btime = time();
     }
 }
-var_dump($questionIDs);
-exit;
+foreach($questionIDs as $k=>$v){
+    echo $k.",".$v."\n";
+}
