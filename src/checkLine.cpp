@@ -20,10 +20,10 @@ int checkLine(Tracks tracks)
         vector<LTPoint> points = segment.points;
         LineParam lParam = segment.lParam;
         if(points.size()>2){
-            if(lParam.maxDist<0.03){
+            if(lParam.maxDist<0.03&&lParam.length>500){
                 return Distance;
             }
-            if(lParam.variance<0.02){
+            if(lParam.variance<0.02&&lParam.length>500){
                 return Variance;
             }
         }else{
@@ -98,7 +98,7 @@ int main(int argc, char * argv[])
     rgConfig config;
     simplifyLine.simplifyTrack(config,inputPoints,tracks);
     //绘制
-    //draw(tracks);
+//    draw(tracks);
     ret = checkLine(tracks);
     printf("Checkline ret: %d \n", ret);
     return ret;
