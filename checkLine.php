@@ -5,7 +5,7 @@ $endPos     = intval($argv[2]);
 echo "开始导入第".$beginPos."至".$endPos."条\n";
 $rootDir = dirname(__FILE__);
 $recordPath = $rootDir."/data/checkLine/".$beginPos."_tmpRecord.json";
-$file   = file_get_contents("./data/record_error.log");
+$file   = file_get_contents("./data/record_0917.log");
 $lines  = explode("\n",$file);
 $cnt    = 0;
 $pos    = 0;
