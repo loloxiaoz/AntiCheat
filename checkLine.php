@@ -5,13 +5,16 @@ $endPos     = intval($argv[2]);
 echo "开始导入第".$beginPos."至".$endPos."条\n";
 $rootDir = dirname(__FILE__);
 $recordPath = $rootDir."/data/checkLine/".$beginPos."_tmpRecord.json";
-$file   = file_get_contents("./data/record_0917.log");
+$file   = file_get_contents("./data/record_error.log");
 $lines  = explode("\n",$file);
 $cnt    = 0;
 $pos    = 0;
 $btime  = time();
 $questionIDs = array();
 foreach($lines as $line){
+    if(empty($line)){
+        continue;
+    }
     if($pos<$beginPos){
         $pos++;
         continue;
@@ -20,7 +23,7 @@ foreach($lines as $line){
         break;
     }
     $pos++;
-    list($id,$uid,$distance,$ossUrl,$sportType,$channel) = explode("\t",$line);
+    list($id,$uid,$distance,$ossUrl,$sportType,$channel) = explode(",",$line);
     try {
         echo "处理id为".$id;
         if($sportType==1){
