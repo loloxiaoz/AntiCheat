@@ -9,9 +9,8 @@ using namespace cv;
 
 enum LineReason{Distance=-1,Variance=-2,StepLength=-3,NoTrackPoints=-4};
 
-
 int checkLine(Tracks tracks)
-{ 
+{
     if(tracks.size()>1){
         return Distance;
     }
@@ -21,10 +20,10 @@ int checkLine(Tracks tracks)
         vector<LTPoint> points = segment.points;
         LineParam lParam = segment.lParam;
         if(points.size()>2){
-            if(lParam.maxDist<0.1){
+            if(lParam.maxDist<0.03){
                 return Distance;
             }
-            if(lParam.variance<0.05){
+            if(lParam.variance<0.02){
                 return Variance;
             }
         }else{
